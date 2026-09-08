@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Shared helpers loaded by all .bats files via: load common
 
-SCAD="$BATS_TEST_DIRNAME/../10InchRackGenerator.scad"
-PRESETS="$BATS_TEST_DIRNAME/../10InchRackGenerator.json"
+SCAD="$BATS_TEST_DIRNAME/../10InchRackMountGenerator.scad"
+PRESETS="$BATS_TEST_DIRNAME/../10InchRackMountGenerator.json"
 RENDERS="$BATS_TEST_DIRNAME/renders"
 OPENSCAD="${OPENSCAD:-openscad}"
 IMGSIZE="${IMGSIZE:-2560,1440}"
