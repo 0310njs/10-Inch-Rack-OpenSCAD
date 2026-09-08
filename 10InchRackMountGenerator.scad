@@ -208,6 +208,30 @@ module keystone(){
                         circle(r=3, $fn=3);
         } 
 }
+module add_standoffs(){
+    rotate([90,0,0]){
+        translate([5, 5, 0])
+            difference(){
+                cylinder(h=2.9, d=3, center=true); 
+                cylinder(h=3, d=1, center=true);
+            }
+       translate([-5, 5, 0])
+            difference(){
+                cylinder(h=2.9, d=3, center=true); 
+                cylinder(h=3, d=1, center=true);
+            }
+        translate([5, 0, 0])
+            difference(){
+                cylinder(h=2.9, d=3, center=true); 
+                cylinder(h=3, d=1, center=true);
+            }
+        translate([-5, 0, 0])
+            difference(){
+                cylinder(h=2.9, d=3, center=true); 
+                cylinder(h=3, d=1, center=true);
+            }
+    }
+}
 //***********************************Helper Modules*********************************//
 //***********************************Main Building Modules*********************************//
 // front_panel: used to create Rack panel with mounting holes
@@ -307,7 +331,7 @@ module front_panel() {
 // component_mount: used to make the soild shape of the holder for each component 
 // with air holes and ziptie modules inside as well.
 module component_mount(component, component_width, component_height, component_depth, component_side_offset, component_up_offset, front_wire_holes, component_wire_diameter, air_holes,component_90, component_side_windows) {
-    
+    {//Varibles
     //6 inch racks (mounts=152.4mm; rails=15.875mm; usable space=120.65mm)
     //10 inch racks (mounts=254.0mm; rails=15.875mm; usable space=221.5mm)
     chassis_width = min(component_width + (2 * case_thickness), (rack_width == 152.4) ? 120.65 : 221.5);
@@ -321,7 +345,7 @@ module component_mount(component, component_width, component_height, component_d
     $fn = 64;
     
     turn90 = component_90 ? 90 : 0;
-
+    }
     // Create the main body as a separate module
     module body() {
         chassis_height = min(component_height + (2 * case_thickness), height);
@@ -423,7 +447,10 @@ module component_mount(component, component_width, component_height, component_d
                 cube(([component_width + case_thickness*2 + e*2,component_height - frame_offset,component_depth - zip_tie_cutout_depth - frame_offset]), center = true);
         }
     }
-    
+    module standoffs(){
+        translate([component_side_offset, - component_up_offset + component_height/2 - 1, component_depth/2])
+        add_standoffs();
+    }
     
     // Assembly - boolean structure
     // ==============================================================
@@ -448,7 +475,8 @@ module component_mount(component, component_width, component_height, component_d
             }
             if(component == 2){
                 add_stopper();
-            }
+                standoffs();
+            } 
         }
     }
 }
