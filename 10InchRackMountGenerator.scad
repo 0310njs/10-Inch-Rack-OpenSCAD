@@ -23,8 +23,10 @@ component1_90 = false; // when true turn component 90 degrees clockwise while fa
 component1_wire_holes=4; // [1: Both Sides, 2: Left, 3: Right, 4: disable]
 // Diameter of wire to route through front_wire_holes.
 component1_wire_diameter=7; // Diameter of power wire holes
-// Adds hexagon air cutouts to reduce material and improve cooling.
+// Adds hexagon air hole cutouts to reduce material and improve cooling.
 component1_air_holes=true; // [true:Show air holes, false:Hide air holes]
+// cutout a big openings in place of air holes on sides. good for if  you have ports on the sides.
+component1_side_windows=false; // [true:cutout big openings on sides, false:dont do that.]
 // ========================================
 /* [Component2] */
 component2 = 4; // [1: Insert Mount, 2: Shelf Mount, 3: Hard Drive Mount, 4: disable]
@@ -39,8 +41,10 @@ component2_90 = false; // when true turn component 90 degrees clockwise while fa
 component2_wire_holes=4; // [1: Both Sides, 2: Left, 3: Right, 4: disable]
 // Diameter of wire to route through front_wire_holes.
 component2_wire_diameter=7; // Diameter of power wire holes
-// Adds hexagon air cutouts to reduce material and improve cooling.
+// Adds hexagon air hole cutouts to reduce material and improve cooling.
 component2_air_holes=true; // [true:Show air holes, false:Hide air holes]
+// cutout a big openings in place of air holes on sides. good for if  you have ports on the sides.
+component2_side_windows=false; // [true:cutout big openings on sides, false:dont do that.]
 // ========================================
 /* [Component3] */
 component3 = 4; // [1: Insert Mount, 2: Shelf Mount, 3: Hard Drive Mount, 4: disable]
@@ -55,8 +59,10 @@ component3_90 = false; // when true turn component 90 degrees clockwise while fa
 component3_wire_holes=4; // [1: Both Sides, 2: Left, 3: Right, 4: disable]
 // Diameter of wire to route through front_wire_holes.
 component3_wire_diameter=7; // Diameter of power wire holes
-// Adds hexagon air cutouts to reduce material and improve cooling.
+// Adds hexagon air hole cutouts to reduce material and improve cooling.
 component3_air_holes=true; // [true:Show air holes, false:Hide air holes]
+// cutout a big openings in place of air holes on sides. good for if  you have ports on the sides.
+component3_side_windows=false; // [true:cutout big openings on sides, false:dont do that.]
 // ========================================
 /* [Keystone group 1] */
 // Add keystone jacks to the front panel.
@@ -126,8 +132,8 @@ keystone_height = 27.5;
 keystone_depth = 9.7;
 // epsilon for coplanar face fixes, fixes bug where some faces leave a thin sliver of material
 e=0.01; 
-// ============================================================================
-//End parameters
+//***********************************End parameters*********************************//
+//***********************************Helper Modules*********************************//
 module guide_rails(){
     
     translate([-105, 0, 2.9])
@@ -161,7 +167,49 @@ module power_wire_cutouts(component_width, component_height, component_depth, co
             }
     }
 }
+module keystone(){
+    // This module makes one cuboid then cuts it with three more and one cut for the triangle.
+    
+    hole_width=14.9;
+    
+    cut_1_height=3;
+    cut_1_depth=19.3;
+    cut_1_z_offset=-3.36;
+    cut_1_y_offset=-.18;
+    
+    cut_2_height=5.35;
+    cut_2_depth=24.4;
+    cut_2_z_offset=.8;
+    cut_2_y_offset=-.35;
+    
+    cut_3_height=2.35;
+    cut_3_depth=19.8;
+    cut_3_z_offset=4.5;
+    cut_3_y_offset=-.65;
 
+    
+    translate([0, 0, keystone_depth/2])//makes the origin the face 
+        difference(){
+            //main body cuts are made from
+            cuboid([keystone_width, keystone_height, keystone_depth], chamfer=1.25, edges=[TOP], $fn = 10);
+            //cut 1
+            translate([0, cut_1_y_offset,cut_1_z_offset])
+                    cuboid([hole_width, cut_1_depth, cut_1_height], chamfer=3, edges=[FRONT+BOTTOM], $fn = 10);
+            //cut 2
+            translate([0, cut_2_y_offset, cut_2_z_offset])
+                    cuboid([hole_width, cut_2_depth, cut_2_height], $fn = 10);
+            //cut  3
+            translate([0, cut_3_y_offset, cut_3_z_offset])
+                    cuboid([hole_width, cut_3_depth, cut_3_height]);
+            // cut for the triangle
+            translate([0,(-keystone_height/2)+2.5 , -keystone_depth/2-.01])
+                rotate([0,0,90])
+                    linear_extrude(1)
+                        circle(r=3, $fn=3);
+        } 
+}
+//***********************************Helper Modules*********************************//
+//***********************************Main Building Modules*********************************//
 // front_panel: used to create Rack panel with mounting holes
 module front_panel() {
     // Create all rack holes
@@ -258,7 +306,7 @@ module front_panel() {
 //========================================================================================
 // component_mount: used to make the soild shape of the holder for each component 
 // with air holes and ziptie modules inside as well.
-module component_mount(component, component_width, component_height, component_depth, component_side_offset, component_up_offset, front_wire_holes, component_wire_diameter, air_holes,component_90) {
+module component_mount(component, component_width, component_height, component_depth, component_side_offset, component_up_offset, front_wire_holes, component_wire_diameter, air_holes,component_90, component_side_windows) {
     
     //6 inch racks (mounts=152.4mm; rails=15.875mm; usable space=120.65mm)
     //10 inch racks (mounts=254.0mm; rails=15.875mm; usable space=221.5mm)
@@ -350,7 +398,6 @@ module component_mount(component, component_width, component_height, component_d
             }
         }
     }
-    
     // Adds a lip to each component
     module add_lip() {
         if(front_lip){
@@ -368,7 +415,14 @@ module component_mount(component, component_width, component_height, component_d
         translate([component_side_offset + component_width/2+2, component_height/2 + case_thickness/2 - component_up_offset, chassis_depth_main-4.5])rotate([90,-90,0])
             wedge([3,stopper_size,stopper_size]);
     }
-    
+    //Cuts out a the sides of th mount when component_side_windows in true 
+    module cut_side_windows(){
+        if(component_side_windows){
+            frame_offset = 9;
+            translate([component_side_offset, - component_up_offset, component_depth/2])
+                cube(([component_width + case_thickness*2 + e*2,component_height - frame_offset,component_depth - zip_tie_cutout_depth - frame_offset]), center = true);
+        }
+    }
     
     
     // Assembly - boolean structure
@@ -381,6 +435,7 @@ module component_mount(component, component_width, component_height, component_d
                 component_cutout();  
                 power_wire_cutouts(component_width, component_height, component_depth, component_side_offset, component_up_offset, front_wire_holes, component_wire_diameter);
                 air_holes();
+                cut_side_windows();
                 if(component == 1){
                     zip_tie_features();
                 }
@@ -397,48 +452,6 @@ module component_mount(component, component_width, component_height, component_d
         }
     }
 }
-module keystone(){
-    // This module makes one cuboid then cuts it with three more and one cut for the triangle.
-    
-    hole_width=14.9;
-    
-    cut_1_height=3;
-    cut_1_depth=19.3;
-    cut_1_z_offset=-3.36;
-    cut_1_y_offset=-.18;
-    
-    cut_2_height=5.35;
-    cut_2_depth=24.4;
-    cut_2_z_offset=.8;
-    cut_2_y_offset=-.35;
-    
-    cut_3_height=2.35;
-    cut_3_depth=19.8;
-    cut_3_z_offset=4.5;
-    cut_3_y_offset=-.65;
-
-    
-    translate([0, 0, keystone_depth/2])//makes the origin the face 
-        difference(){
-            //main body cuts are made from
-            cuboid([keystone_width, keystone_height, keystone_depth], chamfer=1.25, edges=[TOP], $fn = 10);
-            //cut 1
-            translate([0, cut_1_y_offset,cut_1_z_offset])
-                    cuboid([hole_width, cut_1_depth, cut_1_height], chamfer=3, edges=[FRONT+BOTTOM], $fn = 10);
-            //cut 2
-            translate([0, cut_2_y_offset, cut_2_z_offset])
-                    cuboid([hole_width, cut_2_depth, cut_2_height], $fn = 10);
-            //cut  3
-            translate([0, cut_3_y_offset, cut_3_z_offset])
-                    cuboid([hole_width, cut_3_depth, cut_3_height]);
-            // cut for the triangle
-            translate([0,(-keystone_height/2)+2.5 , -keystone_depth/2-.01])
-                rotate([0,0,90])
-                    linear_extrude(1)
-                        circle(r=3, $fn=3);
-        } 
-}
-
 module keystone_jack_group(keystone_jack_group, keystone_jack_side_offset, keystone_jack_up_offset, keystone_jack_num, keystone_jack_I_rotate, keystone_jack_spaceing, keystone_jack_vertical){
     
     // checks if keystones should be made vertically or horazontally
@@ -454,14 +467,15 @@ module keystone_jack_group(keystone_jack_group, keystone_jack_side_offset, keyst
         }      
     }
 }
+//***********************************Main Building Modules*********************************//
+//***********************************Final Building Modules*********************************//
 //  make_rack(): Main assembly - boolean structure
-// ==============================================================
 module make_rack(){
                 union(){
                     front_panel();
-                    component_mount(component1, component1_width, component1_height, component1_depth, component1_side_offset, component1_up_offset, component1_wire_holes, component1_wire_diameter, component1_air_holes, component1_90);  
-                    component_mount(component2, component2_width, component2_height, component2_depth, component2_side_offset, component2_up_offset, component2_wire_holes, component2_wire_diameter, component2_air_holes, component2_90);
-                    component_mount(component3, component3_width, component3_height, component3_depth, component3_side_offset, component3_up_offset, component3_wire_holes, component3_wire_diameter, component3_air_holes, component3_90);
+                    component_mount(component1, component1_width, component1_height, component1_depth, component1_side_offset, component1_up_offset, component1_wire_holes, component1_wire_diameter, component1_air_holes, component1_90, component1_side_windows);  
+                    component_mount(component2, component2_width, component2_height, component2_depth, component2_side_offset, component2_up_offset, component2_wire_holes, component2_wire_diameter, component2_air_holes, component2_90, component2_side_windows);
+                    component_mount(component3, component3_width, component3_height, component3_depth, component3_side_offset, component3_up_offset, component3_wire_holes, component3_wire_diameter, component3_air_holes, component3_90, component1_side_windows);
                     keystone_jack_group(keystones1,keystones1_side_offset,keystones1_up_offset,keystones1_num,keystones1_I_rotate,keystones1_spaceing, keystones1_vertical);
                     keystone_jack_group(keystones2,keystones2_side_offset,keystones2_up_offset,keystones2_num,keystones2_I_rotate,keystones2_spaceing, keystones2_vertical);
                 }
@@ -469,7 +483,6 @@ module make_rack(){
                 guide_rails();
             }
 }
-// ==============================================================
 // Call the module
 if ($preview) {
     rotate([-90,0,0])
