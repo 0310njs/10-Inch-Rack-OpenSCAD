@@ -209,28 +209,36 @@ module keystone(){
         } 
 }
 module add_standoffs(){
+
+    out_d = 5.5;
+    in_d = 2.9;
+    h =  4;
     rotate([90,0,0]){
-        translate([5, 5, 0])
+        translate([14, 67, 0])
             difference(){
-                cylinder(h=2.9, d=3, center=true); 
-                cylinder(h=3, d=1, center=true);
+                cylinder(h=h, d=out_d, center=true); 
+                cylinder(h=h+.1, d=in_d, center=true);
             }
-       translate([-5, 5, 0])
+       translate([-14, 74, 0])
             difference(){
-                cylinder(h=2.9, d=3, center=true); 
-                cylinder(h=3, d=1, center=true);
+                cylinder(h=h, d=out_d, center=true); 
+                cylinder(h=h+.1, d=in_d, center=true);
             }
-        translate([5, 0, 0])
+        translate([14, -73.5, 0])
             difference(){
-                cylinder(h=2.9, d=3, center=true); 
-                cylinder(h=3, d=1, center=true);
+                cylinder(h=h, d=out_d, center=true); 
+                cylinder(h=h+.1, d=in_d, center=true);
             }
-        translate([-5, 0, 0])
+        translate([-14, -73.5, 0])
             difference(){
-                cylinder(h=2.9, d=3, center=true); 
-                cylinder(h=3, d=1, center=true);
+                cylinder(h=h, d=out_d, center=true); 
+                cylinder(h=h+.1, d=in_d, center=true);
             }
     }
+}
+module gpu_sheild_cutout(){
+    translate([0, 0, -85.5])
+        cube([40, 40 , 5], center = true);
 }
 //***********************************Helper Modules*********************************//
 //***********************************Main Building Modules*********************************//
@@ -290,7 +298,7 @@ module front_panel() {
         if (keystone_jack_group) { //check if Keystone group enabled
             translate([0, 0, front_plate_thickness/2]) {
                 for (i = [0:keystone_jack_num-1]) { // loop for making multible jacks
-                        translate([keystone_jack_side_offset + i*(keystone_x_spacing), keystone_jack_up_offset + i*(keystone_y_spacing), 0])
+                        translate([keystone_jack_side_offset + i*(keystone_x_spacing), -keystone_jack_up_offset + i*(keystone_y_spacing), 0])
                             rotate([0,0,keystone_jack_I_rotate]) // rotate cuts for jacks individually
                                 cube([keystone_width, keystone_height, front_plate_thickness + 2 * tolerance], center=true);
                 }
@@ -327,7 +335,6 @@ module front_panel() {
         component_front_cutout(component3, component3_width, component3_height, component3_depth, component3_side_offset, component3_up_offset, component3_wire_holes, component3_wire_diameter, component3_90 );
     }
 }
-//========================================================================================
 // component_mount: used to make the soild shape of the holder for each component 
 // with air holes and ziptie modules inside as well.
 module component_mount(component, component_width, component_height, component_depth, component_side_offset, component_up_offset, front_wire_holes, component_wire_diameter, air_holes,component_90, component_side_windows) {
@@ -401,26 +408,29 @@ module component_mount(component, component_width, component_height, component_d
     // Simplified air holes with staggered honeycomb pattern on all faces
     module air_holes(){
         
-        test_hex_fit_Y = (component_height + case_thickness*2) - ( hex_spacing + hex_bottom_frame*2);
-        test_hex_fit_x = (component_width + case_thickness*2) - ( hex_spacing + hex_bottom_frame*2);
-        test_hex_fit_z = (component_depth) - ( hex_spacing + hex_bottom_frame*2);        
-        
-        if(air_holes && test_hex_fit_z > 0){
-            translate([component_side_offset, - component_up_offset, component_depth/2]){
-                if(test_hex_fit_x >= 0){// cut hex hole from top and bottom
-                    difference(){         
-                        cuboid([component_width + case_thickness*2 + e*2, component_height + case_thickness*2 + e*2, component_depth],rounding=0,edges=["Z"], $fn = 10);
-                        hex_panel([component_width + case_thickness*2 + e*2, component_depth, component_height + case_thickness*2 + e*2], hex_strut, hex_spacing, frame=hex_bottom_frame, orient=FRONT, $fn = 10); 
-                    }
-                }
-                if (test_hex_fit_Y >= 0){//  cut hex holes form the sides
-                    difference(){            
-                        cuboid([component_width+ case_thickness*2 + e*2, component_height + case_thickness*2 + e*2, component_depth],rounding=0,edges=["Z"], $fn = 10);
-                        hex_panel([ component_depth, component_height + case_thickness*2 + e*2, component_width+ case_thickness*2 + e*2 ], hex_strut, hex_spacing, frame=hex_bottom_frame, orient=LEFT, $fn = 10); 
-                    }
-                }
+      test_hex_fit_Y = (component_height + case_thickness*2) - ( hex_spacing + hex_bottom_frame*2);
+      test_hex_fit_x = (component_width + case_thickness*2) - ( hex_spacing + hex_bottom_frame*2);
+      test_hex_fit_z = (component_depth) - ( hex_spacing + hex_bottom_frame*2);        
+      
+      if(air_holes && test_hex_fit_z > 0){
+        translate([component_side_offset, - component_up_offset, component_depth/2]){
+          if(test_hex_fit_x >= 0){// cut hex hole from top and bottom
+            difference(){         
+                cuboid([component_width + case_thickness*2 + e*2, component_height + case_thickness*2 + e*2, component_depth],rounding=0,edges=["Z"], $fn = 10);
+                hex_panel([component_width + case_thickness*2 + e*2, component_depth, component_height + case_thickness*2 + e*2], hex_strut, hex_spacing, frame=hex_bottom_frame, orient=FRONT, $fn = 10); 
             }
+          }
+          if (test_hex_fit_Y >= 0){//  cut hex holes form the sides
+            difference(){ 
+              rotate([90,0,0])
+                cuboid([component_width+ case_thickness*2 + e*2, component_depth, component_height + case_thickness*2 + e*2],rounding=0,edges=["Z"], $fn = 10);
+              rotate([90,0,0])
+                hex_panel([ component_height + case_thickness*2 + e*2, component_depth, component_width+ case_thickness*2 + e*2 ], hex_strut, hex_spacing, frame=hex_bottom_frame, orient=LEFT, $fn = 10); 
+                
+            }
+          }
         }
+      }
     }
     // Adds a lip to each component
     module add_lip() {
@@ -448,10 +458,13 @@ module component_mount(component, component_width, component_height, component_d
         }
     }
     module standoffs(){
-        translate([component_side_offset, - component_up_offset + component_height/2 - 1, component_depth/2])
+        translate([component_side_offset, - component_up_offset + component_height/2 - 1.5, component_depth/2+7])
         add_standoffs();
     }
-    
+    module gpucuts(){
+        translate([component_side_offset, - component_up_offset + component_height/2, component_depth/2+7])
+        gpu_sheild_cutout();
+    }
     // Assembly - boolean structure
     // ==============================================================
     if(component < 4){
@@ -467,7 +480,8 @@ module component_mount(component, component_width, component_height, component_d
                     zip_tie_features();
                 }
                 if(component == 2){
-                    shelf_type();                    
+                    shelf_type();
+                    gpucuts();                    
                 }
             }
             if(component == 1){
@@ -488,7 +502,7 @@ module keystone_jack_group(keystone_jack_group, keystone_jack_side_offset, keyst
     
     if (keystone_jack_group){   //check if Keystone group enabled
         for (i = [0:keystone_jack_num-1]) { // loop for making multible jacks
-            translate([keystone_jack_side_offset + i*(keystone_x_spacing), keystone_jack_up_offset + i*(keystone_y_spacing), 0]) 
+            translate([keystone_jack_side_offset + i*(keystone_x_spacing), -keystone_jack_up_offset + i*(keystone_y_spacing), 0]) 
                 rotate([0,0,keystone_jack_I_rotate]){// rotate jacks individually
                     keystone();  
             }    
