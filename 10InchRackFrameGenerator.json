@@ -14,6 +14,23 @@
             "rack_height": "4.5",
             "rack_width": "254",
             "show_me": "1"
+        },
+        "New set 2": {
+            "accessories": "1",
+            "air_holes": "true",
+            "connection_part": "1",
+            "doubled": "false",
+            "front_plate_thickness": "3",
+            "half_height_holes": "true",
+            "hex_bottom_frame": "10",
+            "hex_chamfered": "false",
+            "hex_spacing": "15",
+            "hex_strut": "4",
+            "rack_depth": "2",
+            "rack_frame_part": "7",
+            "rack_height": "3",
+            "rack_width": "254",
+            "show_me": "1"
         }
     }
 }

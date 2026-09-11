@@ -9,7 +9,7 @@ rack_height = 1.0; // [0.5:0.5:5.5]
 front_plate_thickness = 3.0;
 // Guide rails show the suggested boundrys of the mounts of the rack.(guide rails will not show up in final rendering).
 guide_rails_on = true;
-// ========================================
+// ============================================================================================
 /* [Component1] */
 component1 = 1; // [1: Insert Mount, 2: Shelf Mount, 3: Hard Drive Mount, 4: disable]
 component1_width = 110.0;
@@ -27,7 +27,7 @@ component1_wire_diameter=7; // Diameter of power wire holes
 component1_air_holes=true; // [true:Show air holes, false:Hide air holes]
 // cutout a big openings in place of air holes on sides. good for if  you have ports on the sides.
 component1_side_windows=false; // [true:cutout big openings on sides, false:dont do that.]
-// ========================================
+// ============================================================================================
 /* [Component2] */
 component2 = 4; // [1: Insert Mount, 2: Shelf Mount, 3: Hard Drive Mount, 4: disable]
 component2_width = 110.0;
@@ -45,7 +45,7 @@ component2_wire_diameter=7; // Diameter of power wire holes
 component2_air_holes=true; // [true:Show air holes, false:Hide air holes]
 // cutout a big openings in place of air holes on sides. good for if  you have ports on the sides.
 component2_side_windows=false; // [true:cutout big openings on sides, false:dont do that.]
-// ========================================
+// ============================================================================================
 /* [Component3] */
 component3 = 4; // [1: Insert Mount, 2: Shelf Mount, 3: Hard Drive Mount, 4: disable]
 component3_width = 110.0;
@@ -63,7 +63,7 @@ component3_wire_diameter=7; // Diameter of power wire holes
 component3_air_holes=true; // [true:Show air holes, false:Hide air holes]
 // cutout a big openings in place of air holes on sides. good for if  you have ports on the sides.
 component3_side_windows=false; // [true:cutout big openings on sides, false:dont do that.]
-// ========================================
+// ============================================================================================
 /* [Keystone group 1] */
 // Add keystone jacks to the front panel.
 keystones1 = false;    // [true: Place keystone jacks, false: Remove keystone jacks]
@@ -79,7 +79,7 @@ keystones1_num = 1; // [1:1:10]
 keystones1_spaceing = 0; // [0:0.1:20]
 //Enabling this feature will stack the keystones vertically instead of horazontally
 keystones1_vertical = false;
-// ========================================
+// ============================================================================================
 /* [Keystone group 2] */
 // Add keystone jacks to the front panel.
 keystones2 = false;    // [true: Place keystone jacks, false: Remove keystone jacks]
@@ -95,7 +95,7 @@ keystones2_num = 1; // [1:1:10]
 keystones2_spaceing = 0; // [0:0.1:20]
 //Enabling this feature will stack the keystones vertically instead of horazontally
 keystones2_vertical = false;
-// ========================================
+// ============================================================================================
 /* [Air Hole Settings] */
 // size of struts between hexs.
 hex_strut = 4; // [1:1:14]
@@ -103,7 +103,7 @@ hex_strut = 4; // [1:1:14]
 hex_spacing = 15;
 // controls the thickness of the frame around the  hex cutout.
 hex_bottom_frame = 10;  // [8:0.5:13]
-// ========================================
+// ============================================================================================
 /* [Advanced] */
 // Used when rack_height is a fraction, cuts a half oval for screws, otherwise will cover up the hole
 half_height_holes = true; // [true:Show partial holes at edges, false:Hide partial holes]
@@ -117,7 +117,7 @@ front_lip = true; // [true:Show front lip, false:Hide front lip]
 stopper_size=10;
 // Default gap between part and print walls
 tolerance = 0.42;
-// ========================================
+// ============================================================================================
 /* [Hidden] */
 height = 44.45 * rack_height;
 //ziptie variables
@@ -214,31 +214,31 @@ module add_standoffs(){
     in_d = 2.9;
     h =  4;
     rotate([90,0,0]){
-        translate([14, 67, 0])
-            difference(){
-                cylinder(h=h, d=out_d, center=true); 
-                cylinder(h=h+.1, d=in_d, center=true);
-            }
-       translate([-14, 74, 0])
-            difference(){
-                cylinder(h=h, d=out_d, center=true); 
-                cylinder(h=h+.1, d=in_d, center=true);
-            }
-        translate([14, -73.5, 0])
-            difference(){
-                cylinder(h=h, d=out_d, center=true); 
-                cylinder(h=h+.1, d=in_d, center=true);
-            }
-        translate([-14, -73.5, 0])
-            difference(){
-                cylinder(h=h, d=out_d, center=true); 
-                cylinder(h=h+.1, d=in_d, center=true);
-            }
+      translate([14, 67, 0])
+        difference(){
+          cylinder(h=h, d=out_d, center=true); 
+          cylinder(h=h+.1, d=in_d, center=true);
+        }
+     translate([-14, 74, 0])
+        difference(){
+          cylinder(h=h, d=out_d, center=true); 
+          cylinder(h=h+.1, d=in_d, center=true);
+        }
+      translate([14, -73.5, 0])
+        difference(){
+          cylinder(h=h, d=out_d, center=true); 
+          cylinder(h=h+.1, d=in_d, center=true);
+        }
+      translate([-14, -73.5, 0])
+        difference(){
+          cylinder(h=h, d=out_d, center=true); 
+          cylinder(h=h+.1, d=in_d, center=true);
+        }
     }
 }
 module gpu_sheild_cutout(){
-    translate([0, 0, -85.5])
-        cube([40, 40 , 5], center = true);
+  translate([0, 0, -85.5])
+    cube([40, 40 , 5], center = true);
 }
 //***********************************Helper Modules*********************************//
 //***********************************Main Building Modules*********************************//
@@ -494,6 +494,7 @@ module component_mount(component, component_width, component_height, component_d
         }
     }
 }
+// Keystone_jack_group: used to make the ports used to hold keystone jacks. lets you put up to 10 jacks per group.
 module keystone_jack_group(keystone_jack_group, keystone_jack_side_offset, keystone_jack_up_offset, keystone_jack_num, keystone_jack_I_rotate, keystone_jack_spaceing, keystone_jack_vertical){
     
     // checks if keystones should be made vertically or horazontally
@@ -501,10 +502,10 @@ module keystone_jack_group(keystone_jack_group, keystone_jack_side_offset, keyst
     keystone_y_spacing = (keystone_jack_vertical) ? keystone_width + keystone_jack_spaceing : 0;
     
     if (keystone_jack_group){   //check if Keystone group enabled
-        for (i = [0:keystone_jack_num-1]) { // loop for making multible jacks
-            translate([keystone_jack_side_offset + i*(keystone_x_spacing), -keystone_jack_up_offset + i*(keystone_y_spacing), 0]) 
-                rotate([0,0,keystone_jack_I_rotate]){// rotate jacks individually
-                    keystone();  
+      for (i = [0:keystone_jack_num-1]) { // loop for making multible jacks
+        translate([keystone_jack_side_offset + i*(keystone_x_spacing), -keystone_jack_up_offset + i*(keystone_y_spacing), 0]) 
+        rotate([0,0,keystone_jack_I_rotate]){// rotate jacks individually
+          keystone();  
             }    
         }      
     }
@@ -513,24 +514,24 @@ module keystone_jack_group(keystone_jack_group, keystone_jack_side_offset, keyst
 //***********************************Final Building Modules*********************************//
 //  make_rack(): Main assembly - boolean structure
 module make_rack(){
-                union(){
-                    front_panel();
-                    component_mount(component1, component1_width, component1_height, component1_depth, component1_side_offset, component1_up_offset, component1_wire_holes, component1_wire_diameter, component1_air_holes, component1_90, component1_side_windows);  
-                    component_mount(component2, component2_width, component2_height, component2_depth, component2_side_offset, component2_up_offset, component2_wire_holes, component2_wire_diameter, component2_air_holes, component2_90, component2_side_windows);
-                    component_mount(component3, component3_width, component3_height, component3_depth, component3_side_offset, component3_up_offset, component3_wire_holes, component3_wire_diameter, component3_air_holes, component3_90, component1_side_windows);
-                    keystone_jack_group(keystones1,keystones1_side_offset,keystones1_up_offset,keystones1_num,keystones1_I_rotate,keystones1_spaceing, keystones1_vertical);
-                    keystone_jack_group(keystones2,keystones2_side_offset,keystones2_up_offset,keystones2_num,keystones2_I_rotate,keystones2_spaceing, keystones2_vertical);
-                }
-            if($preview && guide_rails_on){
-                guide_rails();
-            }
+  union(){
+    front_panel();
+      component_mount(component1, component1_width, component1_height, component1_depth, component1_side_offset, component1_up_offset, component1_wire_holes, component1_wire_diameter, component1_air_holes, component1_90, component1_side_windows);  
+      component_mount(component2, component2_width, component2_height, component2_depth, component2_side_offset, component2_up_offset, component2_wire_holes, component2_wire_diameter, component2_air_holes, component2_90, component2_side_windows);
+      component_mount(component3, component3_width, component3_height, component3_depth, component3_side_offset, component3_up_offset, component3_wire_holes, component3_wire_diameter, component3_air_holes, component3_90, component1_side_windows);
+      keystone_jack_group(keystones1,keystones1_side_offset,keystones1_up_offset,keystones1_num,keystones1_I_rotate,keystones1_spaceing, keystones1_vertical);
+      keystone_jack_group(keystones2,keystones2_side_offset,keystones2_up_offset,keystones2_num,keystones2_I_rotate,keystones2_spaceing, keystones2_vertical);
+      }
+  if($preview && guide_rails_on){
+      guide_rails();
+  }
 }
 // Call the module
 if ($preview) {
-    rotate([-90,0,0])
-        translate([0, -height/2, -component1_depth/2]){
-            make_rack();
-        }
+  rotate([-90,0,0])
+    translate([0, -height/2, -component1_depth/2]){
+      make_rack();
+      }
 } else {
     make_rack();
 }
